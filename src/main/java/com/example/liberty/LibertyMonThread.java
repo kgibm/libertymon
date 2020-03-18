@@ -20,7 +20,7 @@ public class LibertyMonThread extends Thread {
 
 	private LibertyMonitors monitors;
 	private boolean running = true;
-	private int sleepTime = Integer.getInteger("LIBERTYMON_SLEEP_MILLISECONDS", 30000);
+	private int sleepTime = Integer.getInteger("LIBERTYMON_SLEEP_MILLISECONDS", 60000);
 	private final File directory;
 	private final File file;
 	private int maxFailures = Integer.getInteger("LIBERTYMON_MAX_IO_FAILURES", 5);
@@ -165,11 +165,7 @@ public class LibertyMonThread extends Thread {
 		columns.clear();
 		data.clear();
 
-		columns.add("Time");
-		data.add(Instant.now().toString());
-
-		columns.add("Name");
-		data.add(monitors.server.getName());
+		populateData();
 
 		if (needsHeader && columns.size() != previousColumnsSize) {
 			if (!append(columns.toArray())) {
@@ -183,6 +179,35 @@ public class LibertyMonThread extends Thread {
 
 		if (LOG.isLoggable(Level.FINER))
 			LOG.exiting(SOURCE_CLASS, "process");
+	}
+
+	public void populateData() {
+		columns.add("Time");
+		data.add(Instant.now().toString());
+
+		columns.add("Name");
+		data.add(monitors.server.getName());
+		
+		columns.add("PID");
+		data.add(monitors.pid);
+		
+		columns.add("Classes");
+		data.add(monitors.classloading.getLoadedClassCount());
+		
+		columns.add("JavaHeap");
+		data.add(monitors.memory.getHeapMemoryUsage().getUsed());
+		
+		columns.add("JVMHeap");
+		data.add(monitors.memory.getNonHeapMemoryUsage().getUsed());
+		
+		columns.add("TotalThreads");
+		data.add(monitors.threads.getThreadCount());
+		
+		columns.add("CPUThreads");
+		data.add(monitors.os.getAvailableProcessors());
+		
+		columns.add("SystemLoadAverage1Min");
+		data.add(monitors.os.getSystemLoadAverage());
 	}
 
 	public boolean append(Object... values) {
