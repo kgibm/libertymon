@@ -39,15 +39,35 @@ public class LibertyMonThread extends Thread {
 		setMonitors(monitors);
 
 		String outputDir = System.getProperty("LIBERTYMON_DIR");
+
+		if (LOG.isLoggable(Level.FINE))
+			LOG.fine("LIBERTYMON_DIR: " + outputDir);
+
 		if (outputDir == null || outputDir.length() == 0) {
 			outputDir = System.getenv("LOG_DIR");
+
+			if (LOG.isLoggable(Level.FINE))
+				LOG.fine("LOG_DIR: " + outputDir);
+
 			if (outputDir == null || outputDir.length() == 0) {
 				outputDir = System.getenv("WLP_OUTPUT_DIR");
+
+				if (LOG.isLoggable(Level.FINE))
+					LOG.fine("WLP_OUTPUT_DIR: " + outputDir);
+
 				if (outputDir == null || outputDir.length() == 0) {
 					outputDir = ".";
+				} else {
+					outputDir += File.separator + monitors.server.getName() + File.separator + "logs";
+					if (!new File(outputDir).exists()) {
+						outputDir = System.getenv("WLP_OUTPUT_DIR");
+					}
 				}
 			}
 		}
+
+		if (LOG.isLoggable(Level.FINE))
+			LOG.fine("outputDir: " + outputDir);
 
 		directory = new File(outputDir);
 		String filename = System.getProperty("LIBERTYMON_FILE", "libertymon.csv");
