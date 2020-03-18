@@ -51,25 +51,30 @@ public class LibertyMonThread extends Thread {
 		String filename = System.getProperty("LIBERTYMON_FILE", "libertymon.csv");
 		file = new File(directory, filename);
 
-		if (file.exists()) {
-			if (backupOldLogWithDate) {
-				File renamedFile = new File(outputDir,
-						filename.replaceAll(".csv", "") + "_" + filesdf.format(new Date()) + ".csv");
+		try {
+			if (file.exists()) {
+				if (backupOldLogWithDate) {
+					File renamedFile = new File(outputDir,
+							filename.replaceAll(".csv", "") + "_" + filesdf.format(new Date()) + ".csv");
 
-				LibertyMonUtilities.debug(LOG, "Rotating old file to " + renamedFile.getAbsolutePath());
+					LibertyMonUtilities.debug(LOG, "Rotating old file to " + renamedFile.getAbsolutePath());
 
-				file.renameTo(renamedFile);
-			} else if (backupOldLogOnce) {
-				File renamedFile = new File(outputDir, filename + ".prev");
-				
-				if (renamedFile.exists()) {
-					renamedFile.delete();
+					file.renameTo(renamedFile);
+				} else if (backupOldLogOnce) {
+					File renamedFile = new File(outputDir, filename + ".prev");
+
+					if (renamedFile.exists()) {
+						renamedFile.delete();
+					}
+
+					LibertyMonUtilities.debug(LOG, "Rotating old file to " + renamedFile.getAbsolutePath());
+
+					file.renameTo(renamedFile);
 				}
-
-				LibertyMonUtilities.debug(LOG, "Rotating old file to " + renamedFile.getAbsolutePath());
-
-				file.renameTo(renamedFile);
 			}
+		} catch (Throwable t) {
+			LibertyMonUtilities.handleException(t, LOG, SOURCE_CLASS, "<init>",
+					"failed to rename old file " + file.getAbsolutePath());
 		}
 
 		LibertyMonUtilities.info(LOG, SOURCE_CLASS, "<init>", "Writing to " + file.getAbsolutePath());
