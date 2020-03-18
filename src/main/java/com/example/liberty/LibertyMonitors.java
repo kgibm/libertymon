@@ -9,6 +9,7 @@ import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
+import com.ibm.websphere.kernel.server.ServerInfoMBean;
 import com.ibm.websphere.monitor.jmx.JvmMXBean;
 import com.ibm.websphere.monitor.jmx.ThreadPoolMXBean;
 
@@ -16,6 +17,7 @@ public class LibertyMonitors {
 	private static final String SOURCE_CLASS = LibertyMonitors.class.getName();
 	private static final Logger LOG = Logger.getLogger(SOURCE_CLASS);
 
+	public ServerInfoMBean server;
 	public JvmMXBean jvm;
 	public ThreadPoolMXBean threadPool;
 
@@ -26,11 +28,19 @@ public class LibertyMonitors {
 	public LibertyMonitors create() throws MalformedObjectNameException {
 		// https://www.ibm.com/support/knowledgecenter/SSEQTP_liberty/com.ibm.websphere.wlp.doc/ae/rwlp_mbeans_list.html
 
+		// https://www.ibm.com/support/knowledgecenter/SSEQTP_liberty/com.ibm.websphere.javadoc.liberty.doc/com.ibm.websphere.appserver.api.kernel.service_1.0-javadoc/com/ibm/websphere/kernel/server/ServerInfoMBean.html
+		server = lookupMXBean(ServerInfoMBean.OBJECT_NAME, ServerInfoMBean.class);
+		if (server == null) {
+			LibertyMonUtilities.error(LOG, SOURCE_CLASS, "create",
+					"ServerInfo MXBean can't be looked up; probably something wrong with the MBeanServer, Liberty, or this is not a Liberty process.");
+		}
+
 		// https://www.ibm.com/support/knowledgecenter/SSEQTP_liberty/com.ibm.websphere.wlp.doc/ae/rwlp_mon_jvm.html
 		// https://www.ibm.com/support/knowledgecenter/SSEQTP_liberty/com.ibm.websphere.javadoc.liberty.doc/com.ibm.websphere.appserver.api.monitor_1.1-javadoc/com/ibm/websphere/monitor/jmx/JvmMXBean.html
 		jvm = lookupMXBean("WebSphere:type=JvmStats", JvmMXBean.class);
 		if (jvm == null) {
-			LibertyMonUtilities.warning(LOG, SOURCE_CLASS, "create", "monitor feature not enabled. Some statistics will be skipped.");
+			LibertyMonUtilities.warning(LOG, SOURCE_CLASS, "create",
+					"monitor feature not enabled. Some statistics will be skipped.");
 		}
 
 		// https://www.ibm.com/support/knowledgecenter/SSEQTP_liberty/com.ibm.websphere.wlp.doc/ae/rwlp_mon_threadpool.html

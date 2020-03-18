@@ -27,9 +27,11 @@ public class LibertyMonThread extends Thread {
 	private int failures = 0;
 	private List<String> columns = new ArrayList<>();
 	private List<Object> data = new ArrayList<>();
-	private boolean backupOldLogWithDate = Boolean.parseBoolean(System.getProperty("LIBERTYMON_BOLWDATE", "false"));
-	private boolean backupOldLogOnce = Boolean.parseBoolean(System.getProperty("LIBERTYMON_BOLONCE", "true"));
+	private boolean backupOldLogWithDate = Boolean.parseBoolean(System.getProperty("LIBERTYMON_BOL_WDATE", "false"));
+	private boolean backupOldLogOnce = Boolean.parseBoolean(System.getProperty("LIBERTYMON_BOL_ONCE", "false"));
+	private boolean backupOldLogNone = Boolean.parseBoolean(System.getProperty("LIBERTYMON_BOL_NONE", "true"));
 	private static final SimpleDateFormat filesdf = new SimpleDateFormat("yy.MM.dd'_'HH.mm.ss");
+	private boolean needsHeader = true;
 
 	public LibertyMonThread(LibertyMonitors monitors) {
 		super(LibertyMonUtilities.APPNAME + "Thread");
@@ -70,6 +72,8 @@ public class LibertyMonThread extends Thread {
 					LibertyMonUtilities.debug(LOG, "Rotating old file to " + renamedFile.getAbsolutePath());
 
 					file.renameTo(renamedFile);
+				} else if (backupOldLogNone) {
+					needsHeader = false;
 				}
 			}
 		} catch (Throwable t) {
@@ -124,7 +128,9 @@ public class LibertyMonThread extends Thread {
 				}
 			}
 
-			process();
+			if (running) {
+				process();
+			}
 		}
 
 		if (LOG.isLoggable(Level.FINER))
@@ -142,7 +148,10 @@ public class LibertyMonThread extends Thread {
 		columns.add("Time");
 		data.add(Instant.now().toString());
 
-		if (columns.size() != previousColumnsSize) {
+		columns.add("Name");
+		data.add(monitors.server.getName());
+
+		if (needsHeader && columns.size() != previousColumnsSize) {
 			if (!append(columns.toArray())) {
 				return;
 			}
