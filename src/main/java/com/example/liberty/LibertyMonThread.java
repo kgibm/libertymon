@@ -29,9 +29,12 @@ public class LibertyMonThread extends Thread {
 	private List<Object> data = new ArrayList<>();
 	private boolean backupOldLogWithDate = Boolean.parseBoolean(System.getProperty("LIBERTYMON_BOL_WDATE", "false"));
 	private boolean backupOldLogOnce = Boolean.parseBoolean(System.getProperty("LIBERTYMON_BOL_ONCE", "false"));
-	private boolean backupOldLogNone = Boolean.parseBoolean(System.getProperty("LIBERTYMON_BOL_NONE", "true"));
+	private boolean backupOldLogNone = Boolean.parseBoolean(System.getProperty("LIBERTYMON_BOL_NONE", "false"));
 	private static final SimpleDateFormat filesdf = new SimpleDateFormat("yy.MM.dd'_'HH.mm.ss");
-	private boolean needsHeader = true;
+
+	private double prevProcessCPU = 0;
+	private long prevGcTime = 0;
+	private long prevGcs = 0;
 
 	public LibertyMonThread(LibertyMonitors monitors) {
 		super(LibertyMonUtilities.APPNAME + "Thread");
@@ -93,7 +96,7 @@ public class LibertyMonThread extends Thread {
 
 					file.renameTo(renamedFile);
 				} else if (backupOldLogNone) {
-					needsHeader = false;
+					file.delete();
 				}
 			}
 		} catch (Throwable t) {
@@ -167,7 +170,7 @@ public class LibertyMonThread extends Thread {
 
 		populateData();
 
-		if (needsHeader && columns.size() != previousColumnsSize) {
+		if (columns.size() != previousColumnsSize) {
 			if (!append(columns.toArray())) {
 				return;
 			}
@@ -187,27 +190,75 @@ public class LibertyMonThread extends Thread {
 
 		columns.add("Name");
 		data.add(monitors.server.getName());
-		
+
 		columns.add("PID");
 		data.add(monitors.pid);
-		
+
 		columns.add("Classes");
 		data.add(monitors.classloading.getLoadedClassCount());
-		
+
 		columns.add("JavaHeap");
 		data.add(monitors.memory.getHeapMemoryUsage().getUsed());
-		
+
 		columns.add("JVMHeap");
 		data.add(monitors.memory.getNonHeapMemoryUsage().getUsed());
-		
+
 		columns.add("TotalThreads");
 		data.add(monitors.threads.getThreadCount());
-		
+
 		columns.add("CPUThreads");
-		data.add(monitors.os.getAvailableProcessors());
-		
+		int cpus = monitors.os.getAvailableProcessors();
+		data.add(cpus);
+
 		columns.add("SystemLoadAverage1Min");
 		data.add(monitors.os.getSystemLoadAverage());
+
+		columns.add("ProcessCPUCumulative");
+		double processCpu = monitors.jvm.getProcessCPU();
+		data.add(processCpu);
+
+		double processCpuDiff = processCpu - prevProcessCPU;
+		columns.add("ProcessCPUDiff");
+		if (processCpu != -1 && prevProcessCPU > 0 && processCpuDiff >= 0) {
+			data.add(processCpuDiff);
+		} else {
+			data.add(0);
+		}
+		prevProcessCPU = processCpu;
+
+		columns.add("ProcessCPU%");
+		if (processCpu != -1 && prevProcessCPU > 0 && processCpuDiff >= 0) {
+			data.add((processCpu - prevProcessCPU) / (double) ((double) cpus * (double) sleepTime / 1000D));
+		} else {
+			data.add(0);
+		}
+
+		columns.add("GCsCumulative");
+		long gcCount = monitors.jvm.getGcCount();
+		data.add(gcCount);
+
+		columns.add("GCsDiff");
+		if (prevGcs > 0) {
+			data.add(gcCount - prevGcs);
+		} else {
+			data.add(0);
+		}
+		prevGcs = gcCount;
+
+		columns.add("GCTimeCumulative");
+		long gctime = monitors.jvm.getGcTime();
+		data.add(gctime);
+
+		columns.add("GCTimeDiff");
+		if (prevGcTime > 0) {
+			data.add(gctime - prevGcTime);
+		} else {
+			data.add(0);
+		}
+		prevGcTime = gctime;
+
+		columns.add("LibertyThreadsActive");
+		data.add(monitors.libertyThreadPool.getActiveThreads());
 	}
 
 	public boolean append(Object... values) {
