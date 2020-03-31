@@ -1,5 +1,7 @@
 # libertymon
 
+Liberty WAR file that periodically writes statistics about the Liberty server to a CSV file (e.g. `logs/libertymon.csv`).
+
 ## Usage
 
 * Download libertymon.war from https://github.com/kgibm/libertymon/releases
@@ -20,4 +22,19 @@ Time,Name,PID,Classes,JavaHeap,JVMHeap,TotalThreads,CPUThreads,SystemLoadAverage
 
 ## Development
 
-* `mvn liberty:dev`
+### Maven goals
+
+* `mvn liberty:dev`: Development-mode Liberty server.
+* `mvn liberty:run`: Run Liberty in the foreground.
+* `mvn liberty:start`: Start Liberty in the background.
+* `mvn liberty:stop`: Stop background Liberty.
+
+Other goals:
+
+* `mvn clean`: Delete all built resources.
+* `mvn compile`: Compile all projects.
+* `mvn package`: Package all projects (e.g. war).
+
+### Logs
+
+`$ cat libertymon-servlet/target/liberty/wlp/usr/servers/libertymonServer/logs/libertymon.csv`
