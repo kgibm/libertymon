@@ -13,7 +13,7 @@ public final class LibertyMonInitializer implements ServletContextListener {
 	private static final String SOURCE_CLASS = LibertyMonInitializer.class.getName();
 	private static final Logger LOG = Logger.getLogger(SOURCE_CLASS);
 
-	private LibertyMonThread thread;
+	private LibertyMonWriter thread;
 
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
@@ -24,7 +24,7 @@ public final class LibertyMonInitializer implements ServletContextListener {
 			LOG.info(LibertyMonUtilities.APPNAME + " " + LibertyMonUtilities.VERSION + " loaded.");
 
 		try {
-			thread = new LibertyMonThread(LibertyMonitors.build());
+			thread = new LibertyMonWriter(LibertyMonitors.build());
 			thread.start();
 		} catch (Throwable t) {
 			LibertyMonUtilities.handleException(t, LOG, SOURCE_CLASS, "contextInitialized", "Failed to lookup MBeans");

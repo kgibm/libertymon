@@ -14,8 +14,8 @@ import java.util.logging.Logger;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
-public class LibertyMonThread extends Thread {
-	private static final String SOURCE_CLASS = LibertyMonThread.class.getName();
+public class LibertyMonWriter extends Thread {
+	private static final String SOURCE_CLASS = LibertyMonWriter.class.getName();
 	private static final Logger LOG = Logger.getLogger(SOURCE_CLASS);
 
 	private LibertyMonitors monitors;
@@ -36,7 +36,7 @@ public class LibertyMonThread extends Thread {
 	private long prevGcTime = 0;
 	private long prevGcs = 0;
 
-	public LibertyMonThread(LibertyMonitors monitors) {
+	public LibertyMonWriter(LibertyMonitors monitors) {
 		super(LibertyMonUtilities.APPNAME + "Thread");
 		setDaemon(true);
 		setMonitors(monitors);
@@ -160,7 +160,7 @@ public class LibertyMonThread extends Thread {
 			LOG.exiting(SOURCE_CLASS, "run");
 	}
 
-	private void process() {
+	public synchronized void process() {
 		if (LOG.isLoggable(Level.FINER))
 			LOG.entering(SOURCE_CLASS, "process");
 
