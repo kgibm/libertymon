@@ -27,7 +27,7 @@ public class EndpointIT {
 
     @BeforeClass
     public static void init() {
-        URL = "http://localhost:9080/libertymon/servlet";
+        URL = "http://localhost:9080/libertymon-ejb/servlet";
     }
 
     @Test

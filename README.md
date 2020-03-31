@@ -2,15 +2,12 @@
 
 Liberty WAR file that periodically writes statistics about the Liberty server to a CSV file (e.g. `logs/libertymon.csv`).
 
-## Usage
+There are two versions depending on which features you want to enable in Liberty:
 
-* Download libertymon.war from https://github.com/kgibm/libertymon/releases
-* Deploy libertymon.war to Liberty
-* Add `<featureManager><feature>monitor-1.0</feature></featureManager>` to server.xml.
-* Add `<webContainer deferServletLoad="false" />` to server.xml.
-* Statistics file automatically written to `${Liberty}/usr/servers/${SERVER}/logs/libertymon.csv` (or wherever LOG_DIR, WLP_OUTPUT_DIR, or -DLIBERTYMON_DIR point to).
+* [liberty-ejb](liberty-ejb): Requires Liberty features ejbLite-3.2, jsp-2.3, and monitor-1.0.
+* [liberty-servlet](liberty-servlet): Requires Liberty features jsp-2.3 and monitor-1.0; however, in addition, it also requires `<webContainer deferServletLoad="false" />`.
 
-## Example
+## Example Output
 
 ```
 Time,Name,PID,Classes,JavaHeap,JVMHeap,TotalThreads,CPUThreads,SystemLoadAverage1Min,ProcessCPUCumulative,ProcessCPUDiff,ProcessCPU%,GCsCumulative,GCsDiff,GCTimeCumulative,GCTimeDiff,LibertyThreadsActive
@@ -22,19 +19,8 @@ Time,Name,PID,Classes,JavaHeap,JVMHeap,TotalThreads,CPUThreads,SystemLoadAverage
 
 ## Development
 
-### Maven goals
+Compile, package, and test both sub-projects:
 
-* `mvn liberty:dev`: Development-mode Liberty server.
-* `mvn liberty:run`: Run Liberty in the foreground.
-* `mvn liberty:start`: Start Liberty in the background.
-* `mvn liberty:stop`: Stop background Liberty.
+`mvn install`
 
-Other goals:
-
-* `mvn clean`: Delete all built resources.
-* `mvn compile`: Compile all projects.
-* `mvn package`: Package all projects (e.g. war).
-
-### Logs
-
-`$ cat libertymon-servlet/target/liberty/wlp/usr/servers/libertymonServer/logs/libertymon.csv`
+See each sub-project for detailed development.
