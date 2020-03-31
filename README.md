@@ -19,7 +19,7 @@ Time,Name,PID,Classes,JavaHeap,JVMHeap,TotalThreads,CPUThreads,SystemLoadAverage
 
 ## Development
 
-Compile, package, and test both sub-projects:
+Compile, package, and test all sub-projects:
 
 `mvn install`
 
