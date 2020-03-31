@@ -1,4 +1,4 @@
-# libertymon
+# libertymon-ejb
 
 Liberty WAR file that periodically writes statistics about the Liberty server to a CSV file (e.g. `logs/libertymon.csv`).
 
