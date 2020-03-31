@@ -6,8 +6,8 @@ Requires Liberty features ejbLite-3.2, jsp-2.3, and monitor-1.0.
 
 ## Usage
 
-* Download libertymon-servlet.war from https://github.com/kgibm/libertymon/releases
-* Deploy libertymon-servlet.war to Liberty (e.g. dropins)
+* Download libertymon-ejb.war from https://github.com/kgibm/libertymon/releases
+* Deploy libertymon-ejb.war to Liberty (e.g. dropins)
 * Add `<featureManager><feature>monitor-1.0</feature><feature>ejbLite-3.2</feature><feature>jsp-2.3</feature></featureManager>` to server.xml if not already included.
 * Statistics file automatically written to `${Liberty}/usr/servers/${SERVER}/logs/libertymon.csv` (or wherever `LOG_DIR`, `WLP_OUTPUT_DIR`, or `-DLIBERTYMON_DIR` point to).
 
