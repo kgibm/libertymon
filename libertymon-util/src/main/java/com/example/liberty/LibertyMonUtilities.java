@@ -5,7 +5,7 @@ import java.util.logging.Logger;
 
 public final class LibertyMonUtilities {
 	public static final String APPNAME = "LibertyMon";
-	public static final String VERSION = "v0.2.20200318";
+	public static final String VERSION = "v0.2.20200331";
 
 	private static final String SOURCE_CLASS = LibertyMonUtilities.class.getName();
 
